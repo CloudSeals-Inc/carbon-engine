@@ -132,11 +132,15 @@ def health():
 
 @app.post("/carbon/calculate", response_model=CarbonResult)
 def calculate(req: CarbonRequest):
+    logger.info("[carbon-engine] POST /carbon/calculate — wo=%s cat=%s weight=%.2fkg verified=%s",
+                req.work_order_id, req.category_code, req.weight_kg, req.verified)
     try:
         result = calculate_carbon_value(req.category_code, req.weight_kg, req.verified)
     except ValueError as e:
         raise HTTPException(400, str(e))
 
+    logger.info("[carbon-engine] Result — co2e=%.4fkg credit=₹%.2f",
+                result['co2e_avoided_kg'], result['carbon_credit_inr'])
     return CarbonResult(
         work_order_id=req.work_order_id,
         category_code=req.category_code,
@@ -149,6 +153,8 @@ def calculate(req: CarbonRequest):
 @app.post("/carbon/calculate/batch")
 def calculate_batch(req: CategoryCarbonRequest):
     """Calculate carbon value for a full work order with mixed waste categories."""
+    logger.info("[carbon-engine] POST /carbon/calculate/batch — wo=%s items=%d",
+                req.work_order_id, len(req.categories))
     results = []
     total_co2e_kg = 0.0
     total_carbon_inr = 0.0
@@ -162,6 +168,8 @@ def calculate_batch(req: CategoryCarbonRequest):
         except ValueError as e:
             results.append({"category_code": item.get("category_code"), "error": str(e)})
 
+    logger.info("[carbon-engine] Batch result — total_co2e=%.4fkg total=₹%.2f",
+                total_co2e_kg, total_carbon_inr)
     return {
         "work_order_id": req.work_order_id,
         "timestamp": datetime.now(timezone.utc).isoformat(),
