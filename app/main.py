@@ -25,7 +25,7 @@ app = FastAPI(
     description="CO2e avoided calculation + severity scoring per IndicWaste category",
     version="1.0.0",
 )
-app.add_middleware(CORSMiddleware, allow_origins=["*", "https://miba-ui-460918627115.europe-west1.run.app"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["*", "https://miba-ui-340635219170.europe-west1.run.app"], allow_methods=["*"], allow_headers=["*"])
 
 # ─── Carbon constants (IPCC AR6 WG3 Ch7 + Verra VM0046) ───────────────────
 # Baseline: India mixed municipal waste landfill = 0.52 tCO2e/tonne
